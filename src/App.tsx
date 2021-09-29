@@ -8,11 +8,13 @@ import {
 import { useQuery } from "react-query";
 // API calls
 import { fetchNearbyPlaces, fetchWeather } from "./api";
-
+// Components
+import CurrentLocation from "./components/CurrentLocation";
 // Styles
 import { Wrapper, LoadingView } from "./App.styles";
+// Map settings
 import { containerStyle, center, options } from "./settings";
-// images
+// Images
 import beerIcon from "./images/beer.svg";
 
 export type WeatherType = {
@@ -68,7 +70,15 @@ const App: React.FC = () => {
     staleTime: 60 * 1000 * 5, // 5 minutes
   });
 
-  console.log(nearbyPositions);
+  // console.log(nearbyPositions);
+
+  const moveTo = (position: google.maps.LatLngLiteral) => {
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat: position.lat, lng: position.lng });
+      mapRef.current.setZoom(14);
+      setClickedPos(position);
+    }
+  };
 
   const onLoad = (map: google.maps.Map<Element>): void => {
     mapRef.current = map;
@@ -89,6 +99,7 @@ const App: React.FC = () => {
 
   return (
     <Wrapper>
+      <CurrentLocation moveTo={moveTo} />
       <GoogleMap
         mapContainerStyle={containerStyle}
         options={options as google.maps.MapOptions}
